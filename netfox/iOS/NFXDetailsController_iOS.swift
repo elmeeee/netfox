@@ -56,7 +56,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Details"
+        title = "Details Saldoo API Response"
         view.layer.masksToBounds = true
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(NFXDetailsController_iOS.actionButtonPressed(_:)))
