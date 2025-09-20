@@ -83,8 +83,8 @@ class NFXListController_iOS: NFXListController, UITableViewDelegate, UITableView
             if #available(iOS 11.0, *) {
                 tableView.contentInsetAdjustmentBehavior = .never
             }
-            tableView.contentInset.top = 0
-            tableView.scrollIndicatorInsets.top = 0
+            tableView.contentInset.top = 6
+            tableView.scrollIndicatorInsets.top = 6
             tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 0.01))
         }
     }
