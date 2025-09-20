@@ -42,6 +42,8 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     var infoView: UIScrollView = UIScrollView()
     var requestView: UIScrollView = UIScrollView()
     var responseView: UIScrollView = UIScrollView()
+    private let headerContainer = UIView()
+    private let headerStack = UIStackView()
 
     private lazy var headerButtons: [UIButton] = {
         return [self.infoButton, self.requestButton, self.responseButton]
