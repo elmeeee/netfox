@@ -52,6 +52,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     }()
 
     internal var sharedContent: String?
+    private var headerTopInset: CGFloat = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,6 +66,15 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         infoButton = createHeaderButton("Info", x: 0, selector: #selector(NFXDetailsController_iOS.infoButtonPressed))
         requestButton = createHeaderButton("Request", x: infoButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.requestButtonPressed))
         responseButton = createHeaderButton("Response", x: requestButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.responseButtonPressed))
+        
+        if #available(iOS 26.0, *) {
+            [infoButton, requestButton, responseButton].forEach {
+                var f = $0.frame
+                f.origin.y += headerTopInset
+                $0.frame = f
+            }
+        }
+        
         headerButtons.forEach { view.addSubview($0) }
 
         // Info views
@@ -74,6 +84,15 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         [infoView, requestView, responseView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = true
             view.addSubview($0)
+        }
+        
+        if #available(iOS 26.0, *) {
+            [infoView, requestView, responseView].forEach {
+                var f = $0.frame
+                f.origin.y += headerTopInset
+                f.size.height -= headerTopInset
+                $0.frame = f
+            }
         }
 
         let left = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); left.direction = .left
