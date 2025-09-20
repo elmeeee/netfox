@@ -67,16 +67,6 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         requestButton = createHeaderButton("Request", x: infoButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.requestButtonPressed))
         responseButton = createHeaderButton("Response", x: requestButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.responseButtonPressed))
         headerButtons.forEach { view.addSubview($0) }
-        
-        headerTopConstraint = headerButtons.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)
-        if let headerTopConstraint {
-            NSLayoutConstraint.activate([
-                headerTopConstraint,
-                headerButtons.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                headerButtons.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                headerButtons.heightAnchor.constraint(equalToConstant: 44)
-            ])
-        }
 
         // Info views
         infoView = createDetailsView(getInfoStringFromObject(selectedModel), forView: .info)
@@ -98,7 +88,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         super.viewDidLayoutSubviews()
         let topY = headerButtons.frame.maxY
         let w = view.bounds.width
-        let h = view.bounds.height - topY
+        let h = view.bounds.height - 0
         infoView.frame     = CGRect(x: 0,     y: topY, width: w, height: h)
         requestView.frame  = CGRect(x: w,     y: topY, width: w, height: h)
         responseView.frame = CGRect(x: w * 2, y: topY, width: w, height: h)
