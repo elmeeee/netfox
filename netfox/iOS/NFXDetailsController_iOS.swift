@@ -36,6 +36,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     var infoButton: UIButton = UIButton()
     var requestButton: UIButton = UIButton()
     var responseButton: UIButton = UIButton()
+    private var headerTopConstraint: NSLayoutConstraint?
 
     private var copyAlert: UIAlertController?
 
