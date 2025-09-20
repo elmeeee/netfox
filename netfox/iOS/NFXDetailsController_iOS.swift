@@ -107,6 +107,27 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
 
         infoButtonPressed()
     }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        if #available(iOS 26.0, *) {
+            let topInset = view.safeAreaInsets.top
+
+            [infoButton, requestButton, responseButton].enumerated().forEach { idx, button in
+                var frame = button.frame
+                frame.origin.y = topInset
+                button.frame = frame
+            }
+
+            [infoView, requestView, responseView].forEach {
+                var f = $0.frame
+                f.origin.y = 44 + topInset
+                f.size.height = view.frame.height - (44 + topInset)
+                $0.frame = f
+            }
+        }
+    }
 
     func createHeaderButton(_ title: String, x: CGFloat, selector: Selector) -> UIButton {
         var tempButton: UIButton
