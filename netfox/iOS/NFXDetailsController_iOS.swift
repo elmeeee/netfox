@@ -110,15 +110,6 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         let left = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); left.direction = .left
         let right = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); right.direction = .right
         view.addGestureRecognizer(left); view.addGestureRecognizer(right)
-
-        if let navBar = navigationController?.navigationBar {
-            let ap = UINavigationBarAppearance()
-            ap.configureWithOpaqueBackground()
-            ap.backgroundColor = .NFXDarkStarkWhiteColor()
-            ap.shadowColor = .clear
-            navBar.standardAppearance = ap
-            navBar.scrollEdgeAppearance = ap
-        }
         
         infoButtonPressed()
     }
