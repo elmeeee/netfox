@@ -74,7 +74,19 @@ class NFXListController_iOS: NFXListController, UITableViewDelegate, UITableView
             searchView.frame = searchController.searchBar.frame
 
             navigationItem.titleView = searchView
-        }     
+        }
+
+        if #available(iOS 26.0, *) {
+            if #available(iOS 15.0, *) {
+                tableView.sectionHeaderTopPadding = 0
+            }
+            if #available(iOS 11.0, *) {
+                tableView.contentInsetAdjustmentBehavior = .never
+            }
+            tableView.contentInset.top = 0
+            tableView.scrollIndicatorInsets.top = 0
+            tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 0.01))
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -117,14 +129,26 @@ class NFXListController_iOS: NFXListController, UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NSStringFromClass(NFXListCell.self), for: indexPath) as! NFXListCell
-        
         cell.configForObject(tableData[indexPath.row])
-        
         return cell
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
         return UIView(frame: .zero)
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if #available(iOS 26.0, *), section == 0 {
+            return UIView(frame: .zero)
+        }
+        return nil
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if #available(iOS 26.0, *), section == 0 {
+            return CGFloat.leastNormalMagnitude
+        }
+        return 0
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
