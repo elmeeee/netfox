@@ -56,47 +56,89 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Details Saldoo API Response"
+        title = "Details Response"
         view.layer.masksToBounds = true
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(NFXDetailsController_iOS.actionButtonPressed(_:)))
 
-        // Header buttons
-        infoButton = createHeaderButton("Info", x: 0, selector: #selector(NFXDetailsController_iOS.infoButtonPressed))
-        requestButton = createHeaderButton("Request", x: infoButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.requestButtonPressed))
-        responseButton = createHeaderButton("Response", x: requestButton.frame.maxX, selector: #selector(NFXDetailsController_iOS.responseButtonPressed))
-        headerButtons.forEach { view.addSubview($0) }
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .action,
+            target: self,
+            action: #selector(actionButtonPressed(_:))
+        )
 
-        // Info views
-        infoView = createDetailsView(getInfoStringFromObject(selectedModel), forView: .info)
-        requestView = createDetailsView(getRequestStringFromObject(selectedModel), forView: .request)
+        infoButton = createHeaderButton("Info",    x: 0, selector: #selector(infoButtonPressed))
+        requestButton = createHeaderButton("Request", x: 0, selector: #selector(requestButtonPressed))
+        responseButton = createHeaderButton("Response", x: 0, selector: #selector(responseButtonPressed))
+
+        headerContainer.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.backgroundColor = .NFXDarkStarkWhiteColor()
+        view.addSubview(headerContainer)
+
+        headerTopConstraint = headerContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12)
+        NSLayoutConstraint.activate([
+            headerTopConstraint,
+            headerContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            headerContainer.heightAnchor.constraint(equalToConstant: 44)
+        ])
+
+        let sep = UIView()
+        sep.backgroundColor = UIColor.black.withAlphaComponent(0.08)
+        sep.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.addSubview(sep)
+        NSLayoutConstraint.activate([
+            sep.heightAnchor.constraint(equalToConstant: 1 / UIScreen.main.scale),
+            sep.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
+            sep.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
+            sep.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor)
+        ])
+
+        headerStack.axis = .horizontal
+        headerStack.distribution = .fillEqually
+        headerStack.translatesAutoresizingMaskIntoConstraints = false
+        headerContainer.addSubview(headerStack)
+        [infoButton, requestButton, responseButton].forEach { headerStack.addArrangedSubview($0) }
+        NSLayoutConstraint.activate([
+            headerStack.topAnchor.constraint(equalTo: headerContainer.topAnchor),
+            headerStack.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
+            headerStack.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
+            headerStack.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor)
+        ])
+
+        infoView     = createDetailsView(getInfoStringFromObject(selectedModel),     forView: .info)
+        requestView  = createDetailsView(getRequestStringFromObject(selectedModel),  forView: .request)
         responseView = createDetailsView(getResponseStringFromObject(selectedModel), forView: .response)
-        infoViews.forEach { view.addSubview($0) }
+        [infoView, requestView, responseView].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = true
+            view.addSubview($0)
+        }
 
-        // Swipe gestures
-        let lswgr = UISwipeGestureRecognizer(target: self, action: #selector(NFXDetailsController_iOS.handleSwipe(_:)))
-        lswgr.direction = .left
-        view.addGestureRecognizer(lswgr)
-
-        let rswgr = UISwipeGestureRecognizer(target: self, action: #selector(NFXDetailsController_iOS.handleSwipe(_:)))
-        rswgr.direction = .right
-        view.addGestureRecognizer(rswgr)
+        let left = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); left.direction = .left
+        let right = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); right.direction = .right
+        view.addGestureRecognizer(left); view.addGestureRecognizer(right)
 
         infoButtonPressed()
     }
+
+        override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let topY = headerContainer.frame.maxY
+        let w = view.bounds.width
+        let h = view.bounds.height - topY
+        infoView.frame     = CGRect(x: 0,     y: topY, width: w, height: h)
+        requestView.frame  = CGRect(x: w,     y: topY, width: w, height: h)
+        responseView.frame = CGRect(x: w * 2, y: topY, width: w, height: h)
+    }
     
     func createHeaderButton(_ title: String, x: CGFloat, selector: Selector) -> UIButton {
-        var tempButton: UIButton
-        tempButton = UIButton()
-        tempButton.frame = CGRect(x: x, y: 0, width: view.frame.width / 3, height: 44)
-        tempButton.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth]
-        tempButton.backgroundColor = UIColor.NFXDarkStarkWhiteColor()
-        tempButton.setTitle(title, for: .init())
-        tempButton.setTitleColor(UIColor.init(netHex: 0x6d6d6d), for: .init())
-        tempButton.setTitleColor(UIColor.init(netHex: 0xf3f3f4), for: .selected)
-        tempButton.titleLabel?.font = UIFont.NFXFont(size: 15)
-        tempButton.addTarget(self, action: selector, for: .touchUpInside)
-        return tempButton
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        btn.backgroundColor = .NFXDarkStarkWhiteColor()
+        btn.setTitle(title, for: .normal)
+        btn.setTitleColor(UIColor(netHex: 0x6d6d6d), for: .normal)
+        btn.setTitleColor(UIColor(netHex: 0xf3f3f4), for: .selected)
+        btn.titleLabel?.font = UIFont.NFXFont(size: 15)
+        btn.addTarget(self, action: selector, for: .touchUpInside)
+        return btn
     }
 
     @objc fileprivate func copyLabel(lpgr: UILongPressGestureRecognizer) {
