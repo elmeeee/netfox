@@ -38,7 +38,6 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
     var responseButton: UIButton = UIButton()
 
     private var copyAlert: UIAlertController?
-    private var headerTopConstraint: NSLayoutConstraint?
 
     var infoView: UIScrollView = UIScrollView()
     var requestView: UIScrollView = UIScrollView()
@@ -82,16 +81,6 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         view.addGestureRecognizer(left); view.addGestureRecognizer(right)
         
         infoButtonPressed()
-    }
-
-        override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        let topY = headerButtons.frame.maxY
-        let w = view.bounds.width
-        let h = view.bounds.height - 0
-        infoView.frame     = CGRect(x: 0,     y: topY, width: w, height: h)
-        requestView.frame  = CGRect(x: w,     y: topY, width: w, height: h)
-        responseView.frame = CGRect(x: w * 2, y: topY, width: w, height: h)
     }
     
     func createHeaderButton(_ title: String, x: CGFloat, selector: Selector) -> UIButton {
