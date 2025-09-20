@@ -61,7 +61,8 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         
         title = "Details Response"
         view.layer.masksToBounds = true
-
+        
+        navigationItem.largeTitleDisplayMode = .never
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .action,
             target: self,
@@ -76,7 +77,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         headerContainer.backgroundColor = .NFXDarkStarkWhiteColor()
         view.addSubview(headerContainer)
 
-        headerTopConstraint = headerContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12)
+        headerTopConstraint = headerContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)
         if let headerTopConstraint {
             NSLayoutConstraint.activate([
                 headerTopConstraint,
@@ -85,17 +86,6 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
                 headerContainer.heightAnchor.constraint(equalToConstant: 44)
             ])
         }
-
-        let sep = UIView()
-        sep.backgroundColor = UIColor.black.withAlphaComponent(0.08)
-        sep.translatesAutoresizingMaskIntoConstraints = false
-        headerContainer.addSubview(sep)
-        NSLayoutConstraint.activate([
-            sep.heightAnchor.constraint(equalToConstant: 1 / UIScreen.main.scale),
-            sep.leadingAnchor.constraint(equalTo: headerContainer.leadingAnchor),
-            sep.trailingAnchor.constraint(equalTo: headerContainer.trailingAnchor),
-            sep.bottomAnchor.constraint(equalTo: headerContainer.bottomAnchor)
-        ])
 
         headerStack.axis = .horizontal
         headerStack.distribution = .fillEqually
@@ -121,6 +111,15 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
         let right = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:))); right.direction = .right
         view.addGestureRecognizer(left); view.addGestureRecognizer(right)
 
+        if let navBar = navigationController?.navigationBar {
+            let ap = UINavigationBarAppearance()
+            ap.configureWithOpaqueBackground()
+            ap.backgroundColor = .NFXDarkStarkWhiteColor()
+            ap.shadowColor = .clear
+            navBar.standardAppearance = ap
+            navBar.scrollEdgeAppearance = ap
+        }
+        
         infoButtonPressed()
     }
 
