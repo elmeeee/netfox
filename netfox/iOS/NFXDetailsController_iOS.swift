@@ -78,6 +78,7 @@ class NFXDetailsController_iOS: NFXDetailsController, MFMailComposeViewControlle
 
         headerTopConstraint = headerContainer.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12)
         NSLayoutConstraint.activate([
+            headerTopConstraint,
             headerContainer.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             headerContainer.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             headerContainer.heightAnchor.constraint(equalToConstant: 44)
