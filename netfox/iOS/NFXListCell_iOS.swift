@@ -133,27 +133,22 @@ import Foundation
             requestTimeLabel.frame = CGRect(
                 x: 0, y: statusCodeLabel.frame.maxY + 4, width: statusView.frame.width, height: 12)
 
-            // Time interval badge
-            timeIntervalLabel.frame = CGRect(
-                x: statusView.frame.maxX + padding,
-                y: cardContainerView.frame.height - 28,
-                width: 60,
-                height: 20
-            )
+            // Time interval badge - will be positioned on right side
+            // (positioned after method/type to avoid overlap)
 
             // URL Label
             URLLabel.frame = CGRect(
                 x: statusView.frame.maxX + padding,
                 y: 12,
-                width: cardContainerView.frame.width - statusView.frame.maxX - padding - 50,
-                height: 36
+                width: cardContainerView.frame.width - statusView.frame.maxX - padding - 30,
+                height: 32
             )
 
             // Method badge
-            let methodWidth: CGFloat = 50
+            let methodWidth: CGFloat = 55
             methodBadge.frame = CGRect(
                 x: statusView.frame.maxX + padding,
-                y: URLLabel.frame.maxY + 4,
+                y: URLLabel.frame.maxY + 6,
                 width: methodWidth,
                 height: 18
             )
@@ -164,8 +159,16 @@ import Foundation
             // Type label
             typeLabel.frame = CGRect(
                 x: methodBadge.frame.maxX + 8,
-                y: URLLabel.frame.maxY + 4,
-                width: 120,
+                y: URLLabel.frame.maxY + 6,
+                width: 100,
+                height: 18
+            )
+
+            // Time interval badge - right side, same row
+            timeIntervalLabel.frame = CGRect(
+                x: cardContainerView.frame.width - 70,
+                y: URLLabel.frame.maxY + 6,
+                width: 65,
                 height: 18
             )
 
@@ -213,15 +216,18 @@ import Foundation
         func setStatus(_ status: Int) {
             statusCodeLabel.text = status == 999 ? "..." : "\(status)"
 
-            // Remove old gradient
+            // Remove old gradient efficiently
             statusGradientLayer?.removeFromSuperlayer()
+            statusGradientLayer = nil
 
             if status == 999 {
                 // Pending/Loading - Gray
                 statusView.backgroundColor = UIColor.NFXGray44Color()
                 timeIntervalLabel.textColor = UIColor.NFXGray44Color()
             } else if status < 400 {
-                // Success - Green gradient
+                // Success - Green gradient (optimized)
+                statusView.backgroundColor = UIColor.NFXGreenColor()
+
                 let gradientLayer = CAGradientLayer()
                 gradientLayer.frame = statusView.bounds
                 gradientLayer.colors = [
@@ -231,11 +237,18 @@ import Foundation
                 gradientLayer.startPoint = CGPoint(x: 0, y: 0)
                 gradientLayer.endPoint = CGPoint(x: 1, y: 1)
                 gradientLayer.cornerRadius = 12
+
+                // Performance optimization
+                gradientLayer.shouldRasterize = true
+                gradientLayer.rasterizationScale = UIScreen.main.scale
+
                 statusView.layer.insertSublayer(gradientLayer, at: 0)
                 statusGradientLayer = gradientLayer
                 timeIntervalLabel.textColor = UIColor.NFXGreenColor()
             } else {
-                // Error - Red gradient
+                // Error - Red gradient (optimized)
+                statusView.backgroundColor = UIColor.NFXRedColor()
+
                 let gradientLayer = CAGradientLayer()
                 gradientLayer.frame = statusView.bounds
                 gradientLayer.colors = [
@@ -245,6 +258,11 @@ import Foundation
                 gradientLayer.startPoint = CGPoint(x: 0, y: 0)
                 gradientLayer.endPoint = CGPoint(x: 1, y: 1)
                 gradientLayer.cornerRadius = 12
+
+                // Performance optimization
+                gradientLayer.shouldRasterize = true
+                gradientLayer.rasterizationScale = UIScreen.main.scale
+
                 statusView.layer.insertSublayer(gradientLayer, at: 0)
                 statusGradientLayer = gradientLayer
                 timeIntervalLabel.textColor = UIColor.NFXRedColor()

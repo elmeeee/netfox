@@ -71,6 +71,7 @@
 
             if #available(iOS 11.0, *) {
                 navigationItem.searchController = searchController
+                navigationItem.hidesSearchBarWhenScrolling = false  // Always show search bar
                 definesPresentationContext = true
             } else {
                 let searchView = UIView()
