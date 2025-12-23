@@ -59,7 +59,13 @@
             super.viewDidLoad()
 
             title = "Details Response"
-            view.layer.masksToBounds = true
+
+            // iOS 26+ modern background
+            if #available(iOS 26.0, *) {
+                view.backgroundColor = UIColor.NFXGray95Color()
+            } else {
+                view.backgroundColor = UIColor.white
+            }
 
             // calculate offset inset for iOS 26+
             if #available(iOS 26.0, *) {
@@ -122,20 +128,41 @@
         override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
 
+            // iOS 26+ comprehensive safe area layout
             if #available(iOS 26.0, *) {
-                let topInset = view.safeAreaInsets.top
+                let safeInsets = view.safeAreaInsets
+                let topInset = safeInsets.top
+                let bottomInset = safeInsets.bottom
+                let leftInset = safeInsets.left
+                let rightInset = safeInsets.right
 
+                // Position header buttons within safe area
+                let buttonWidth = (view.frame.width - leftInset - rightInset) / 3
                 [infoButton, requestButton, responseButton].enumerated().forEach { idx, button in
-                    var frame = button.frame
-                    frame.origin.y = topInset
-                    button.frame = frame
+                    button.frame = CGRect(
+                        x: leftInset + (CGFloat(idx) * buttonWidth),
+                        y: topInset,
+                        width: buttonWidth,
+                        height: 44
+                    )
                 }
 
+                // Position content views within safe area
+                let contentTop = topInset + 44
+                let contentHeight = view.frame.height - contentTop - bottomInset
+                let contentWidth = view.frame.width - leftInset - rightInset
+
                 [infoView, requestView, responseView].forEach {
-                    var f = $0.frame
-                    f.origin.y = 44 + topInset
-                    f.size.height = view.frame.height - (44 + topInset)
-                    $0.frame = f
+                    $0.frame = CGRect(
+                        x: leftInset,
+                        y: contentTop,
+                        width: contentWidth,
+                        height: contentHeight
+                    )
+
+                    // Update scroll view content insets for safe area
+                    $0.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
+                    $0.scrollIndicatorInsets = $0.contentInset
                 }
             }
         }
@@ -147,11 +174,11 @@
             tempButton.autoresizingMask = [
                 .flexibleLeftMargin, .flexibleRightMargin, .flexibleWidth,
             ]
-            tempButton.backgroundColor = UIColor.NFXDarkStarkWhiteColor()
+            tempButton.backgroundColor = UIColor.NFXStarkWhiteColor()
             tempButton.setTitle(title, for: .init())
-            tempButton.setTitleColor(UIColor.init(netHex: 0x6d6d6d), for: .init())
-            tempButton.setTitleColor(UIColor.init(netHex: 0xf3f3f4), for: .selected)
-            tempButton.titleLabel?.font = UIFont.NFXFont(size: 15)
+            tempButton.setTitleColor(UIColor.NFXGray44Color(), for: .init())
+            tempButton.setTitleColor(UIColor.white, for: .selected)
+            tempButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
             tempButton.addTarget(self, action: selector, for: .touchUpInside)
             return tempButton
         }
@@ -193,7 +220,13 @@
                 x: 0, y: topY, width: view.frame.width, height: view.frame.height - topY)
             scrollView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
             scrollView.autoresizesSubviews = true
-            scrollView.backgroundColor = UIColor.clear
+
+            // Modern background for iOS 26+
+            if #available(iOS 26.0, *) {
+                scrollView.backgroundColor = UIColor.NFXGray95Color()
+            } else {
+                scrollView.backgroundColor = UIColor.clear
+            }
 
             var textView: UITextView
             textView = UITextView()
@@ -201,25 +234,41 @@
                 x: 20, y: 20, width: scrollView.frame.width - 40,
                 height: scrollView.frame.height - 20)
             textView.backgroundColor = UIColor.clear
-            textView.font = UIFont.NFXFont(size: 13)
+            textView.font = UIFont.systemFont(ofSize: 13, weight: .regular)
             textView.textColor = UIColor.NFXGray44Color()
             textView.isEditable = false
             textView.attributedText = content
             textView.sizeToFit()
             textView.isUserInteractionEnabled = true
             textView.delegate = self
+
+            // iOS 26+ better text padding
+            if #available(iOS 26.0, *) {
+                textView.textContainerInset = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
+            }
+
             scrollView.addSubview(textView)
 
             let lpgr = UILongPressGestureRecognizer(
                 target: self, action: #selector(NFXDetailsController_iOS.copyLabel))
             textView.addGestureRecognizer(lpgr)
 
+            // Modern styled button
             var moreButton: UIButton
             moreButton = UIButton.init(
                 frame: CGRect(
-                    x: 20, y: textView.frame.maxY + 10, width: scrollView.frame.width - 40,
-                    height: 40))
-            moreButton.backgroundColor = UIColor.NFXGray44Color()
+                    x: 20, y: textView.frame.maxY + 16, width: scrollView.frame.width - 40,
+                    height: 44))
+
+            // Modern button styling
+            moreButton.backgroundColor = UIColor.NFXOrangeColor()
+            moreButton.setTitleColor(UIColor.white, for: .normal)
+            moreButton.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+            moreButton.layer.cornerRadius = 12
+            moreButton.layer.shadowColor = UIColor.NFXOrangeColor().cgColor
+            moreButton.layer.shadowOffset = CGSize(width: 0, height: 4)
+            moreButton.layer.shadowRadius = 8
+            moreButton.layer.shadowOpacity = 0.3
 
             if (forView == EDetailsView.request) && (selectedModel.requestBodyLength > 1024) {
                 moreButton.setTitle("Show request body", for: .init())
@@ -331,6 +380,25 @@
                         let view = infoViews[$0]
 
                         button.isSelected = button == sender
+
+                        // Update button appearance with gradient
+                        if button.isSelected {
+                            // Add gradient background
+                            let gradientLayer = CAGradientLayer()
+                            gradientLayer.frame = button.bounds
+                            gradientLayer.colors = [
+                                UIColor.NFXGradientStartColor().cgColor,
+                                UIColor.NFXGradientEndColor().cgColor,
+                            ]
+                            gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+                            gradientLayer.endPoint = CGPoint(x: 1, y: 0)
+                            button.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+                            button.layer.insertSublayer(gradientLayer, at: 0)
+                        } else {
+                            button.layer.sublayers?.removeAll(where: { $0 is CAGradientLayer })
+                            button.backgroundColor = UIColor.NFXStarkWhiteColor()
+                        }
+
                         view.frame = CGRect(
                             x: CGFloat(-selectedButtonIdx + $0) * view.frame.size.width,
                             y: view.frame.origin.y,

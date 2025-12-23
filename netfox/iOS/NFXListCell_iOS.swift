@@ -8,165 +8,295 @@
 import Foundation
 
 #if os(iOS)
-    
-import UIKit
 
-class NFXListCell: UITableViewCell {
-    
-    let padding: CGFloat = 5
-    var URLLabel: UILabel!
-    var statusView: UIView!
-    var requestTimeLabel: UILabel!
-    var timeIntervalLabel: UILabel!
-    var typeLabel: UILabel!
-    var methodLabel: UILabel!
-    var leftSeparator: UIView!
-    var rightSeparator: UIView!
-    var circleView: UIView!
+    import UIKit
 
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = UIColor.white
-        selectionStyle = .none
-        
+    class NFXListCell: UITableViewCell {
 
-        statusView = UIView(frame: CGRect.zero)
-        contentView.addSubview(statusView)
-        
-        requestTimeLabel = UILabel(frame: CGRect.zero)
-        requestTimeLabel.textAlignment = .center
-        requestTimeLabel.textColor = UIColor.white
-        requestTimeLabel.font = UIFont.NFXFontBold(size: 13)
-        contentView.addSubview(requestTimeLabel)
-        
-        timeIntervalLabel = UILabel(frame: CGRect.zero)
-        timeIntervalLabel.textAlignment = .center
-        timeIntervalLabel.font = UIFont.NFXFont(size: 12)
-        contentView.addSubview(timeIntervalLabel)
-        
-        URLLabel = UILabel(frame: CGRect.zero)
-        URLLabel.textColor = UIColor.NFXBlackColor()
-        URLLabel.font = UIFont.NFXFont(size: 12)
-        URLLabel.numberOfLines = 2
-        contentView.addSubview(URLLabel)
+        let padding: CGFloat = 12
+        let cardPadding: CGFloat = 16
 
-        methodLabel = UILabel(frame: CGRect.zero)
-        methodLabel.textAlignment = .left
-        methodLabel.textColor = UIColor.NFXGray44Color()
-        methodLabel.font = UIFont.NFXFont(size: 12)
-        contentView.addSubview(methodLabel)
-        
-        typeLabel = UILabel(frame: CGRect.zero)
-        typeLabel.textColor = UIColor.NFXGray44Color()
-        typeLabel.font = UIFont.NFXFont(size: 12)
-        contentView.addSubview(typeLabel)
-        
-        circleView = UIView(frame: CGRect.zero)
-        circleView.backgroundColor = UIColor.NFXGray44Color()
-        circleView.layer.cornerRadius = 4
-        circleView.alpha = 0.2
-        contentView.addSubview(circleView)
-        
-        leftSeparator = UIView(frame: CGRect.zero)
-        leftSeparator.backgroundColor = UIColor.white
-        contentView.addSubview(leftSeparator)
-        
-        rightSeparator = UIView(frame: CGRect.zero)
-        rightSeparator.backgroundColor = UIColor.NFXLightGrayColor()
-        contentView.addSubview(rightSeparator)
-    }
-    
-    required init(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        
-        statusView.frame = CGRect(x: 0, y: 0, width: 50, height: frame.height - 1)
+        var cardContainerView: UIView!
+        var URLLabel: UILabel!
+        var statusView: UIView!
+        var statusGradientLayer: CAGradientLayer?
+        var requestTimeLabel: UILabel!
+        var timeIntervalLabel: UILabel!
+        var typeLabel: UILabel!
+        var methodLabel: UILabel!
+        var methodBadge: UIView!
+        var circleView: UIView!
+        var statusCodeLabel: UILabel!
 
-        requestTimeLabel.frame = CGRect(x: 0, y: 13, width: statusView.frame.width, height: 14)
-        
-        timeIntervalLabel.frame = CGRect(x: 0, y: requestTimeLabel.frame.maxY + 5, width: statusView.frame.width, height: 14)
-        
-        URLLabel.frame = CGRect(x: statusView.frame.maxX + padding, y: 0, width: frame.width - URLLabel.frame.minX - 25 - padding, height: 40)
-        URLLabel.autoresizingMask = .flexibleWidth
-        
-        methodLabel.frame = CGRect(x: statusView.frame.maxX + padding, y: URLLabel.frame.maxY - 2, width: 40, height: frame.height - URLLabel.frame.maxY - 2)
+        override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+            super.init(style: style, reuseIdentifier: reuseIdentifier)
+            backgroundColor = UIColor.NFXGray95Color()
+            selectionStyle = .none
 
-        typeLabel.frame = CGRect(x: methodLabel.frame.maxX + padding, y: URLLabel.frame.maxY - 2, width: 180, height: frame.height - URLLabel.frame.maxY - 2)
+            // Card container with shadow and rounded corners
+            cardContainerView = UIView(frame: .zero)
+            cardContainerView.backgroundColor = UIColor.NFXCardBackgroundColor()
+            cardContainerView.layer.cornerRadius = 16
+            cardContainerView.layer.shadowColor = UIColor.black.cgColor
+            cardContainerView.layer.shadowOffset = CGSize(width: 0, height: 2)
+            cardContainerView.layer.shadowRadius = 8
+            cardContainerView.layer.shadowOpacity = 0.08
+            contentView.addSubview(cardContainerView)
 
-        circleView.frame = CGRect(x: URLLabel.frame.maxX + 5, y: 17, width: 8, height: 8)
-        
-        leftSeparator.frame = CGRect(x: 0, y: frame.height - 1, width: statusView.frame.width, height: 1)
-        rightSeparator.frame = CGRect(x: leftSeparator.frame.maxX, y: frame.height - 1, width: frame.width - leftSeparator.frame.maxX, height: 1)
-    }
-    
-    func isNew() {
-        circleView.isHidden = false
-    }
-    
-    func isOld() {
-        circleView.isHidden = true
-    }
-    
-    func configForObject(_ obj: NFXHTTPModel) {
-        setURL(obj.requestURL ?? "-")
-        setStatus(obj.responseStatus ?? 999)
-        setTimeInterval(obj.timeInterval ?? 999)
-        setRequestTime(obj.requestTime ?? "-")
-        setType(obj.responseType ?? "-")
-        setMethod(obj.requestMethod ?? "-")
-        isNewBasedOnDate(obj.responseDate as Date? ?? Date())
-    }
-    
-    func setURL(_ url: String) {
-        URLLabel.text = url
-    }
-    
-    func setStatus(_ status: Int) {
-        if status == 999 {
-            statusView.backgroundColor = UIColor.NFXGray44Color() //gray
-            timeIntervalLabel.textColor = UIColor.white
+            // Status view with gradient
+            statusView = UIView(frame: .zero)
+            statusView.layer.cornerRadius = 12
+            statusView.layer.masksToBounds = true
+            cardContainerView.addSubview(statusView)
 
-        } else if status < 400 {
-            statusView.backgroundColor = UIColor.NFXGreenColor() //green
-            timeIntervalLabel.textColor = UIColor.NFXDarkGreenColor()
+            // Status code label
+            statusCodeLabel = UILabel(frame: .zero)
+            statusCodeLabel.textAlignment = .center
+            statusCodeLabel.textColor = UIColor.white
+            statusCodeLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+            statusView.addSubview(statusCodeLabel)
 
-        } else {
-            statusView.backgroundColor = UIColor.NFXRedColor() //red
-            timeIntervalLabel.textColor = UIColor.NFXDarkRedColor()
+            // Request time label
+            requestTimeLabel = UILabel(frame: .zero)
+            requestTimeLabel.textAlignment = .center
+            requestTimeLabel.textColor = UIColor.white
+            requestTimeLabel.font = UIFont.systemFont(ofSize: 10, weight: .medium)
+            requestTimeLabel.alpha = 0.9
+            statusView.addSubview(requestTimeLabel)
+
+            // Time interval label with badge style
+            timeIntervalLabel = UILabel(frame: .zero)
+            timeIntervalLabel.textAlignment = .center
+            timeIntervalLabel.font = UIFont.systemFont(ofSize: 11, weight: .semibold)
+            timeIntervalLabel.layer.cornerRadius = 8
+            timeIntervalLabel.layer.masksToBounds = true
+            timeIntervalLabel.backgroundColor = UIColor.NFXGray95Color()
+            cardContainerView.addSubview(timeIntervalLabel)
+
+            // URL Label with better typography
+            URLLabel = UILabel(frame: .zero)
+            URLLabel.textColor = UIColor.NFXBlackColor()
+            URLLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+            URLLabel.numberOfLines = 2
+            cardContainerView.addSubview(URLLabel)
+
+            // Method badge
+            methodBadge = UIView(frame: .zero)
+            methodBadge.layer.cornerRadius = 6
+            methodBadge.layer.masksToBounds = true
+            cardContainerView.addSubview(methodBadge)
+
+            // Method label
+            methodLabel = UILabel(frame: .zero)
+            methodLabel.textAlignment = .center
+            methodLabel.font = UIFont.systemFont(ofSize: 10, weight: .bold)
+            methodBadge.addSubview(methodLabel)
+
+            // Type label with icon-like style
+            typeLabel = UILabel(frame: .zero)
+            typeLabel.textColor = UIColor.NFXGray44Color()
+            typeLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
+            cardContainerView.addSubview(typeLabel)
+
+            // New indicator circle with pulse effect
+            circleView = UIView(frame: .zero)
+            circleView.layer.cornerRadius = 5
+            circleView.backgroundColor = UIColor.NFXPinkAccentColor()
+            cardContainerView.addSubview(circleView)
+        }
+
+        required init(coder aDecoder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+
+        override func layoutSubviews() {
+            super.layoutSubviews()
+
+            // Card container with padding
+            cardContainerView.frame = CGRect(
+                x: cardPadding,
+                y: 6,
+                width: frame.width - (cardPadding * 2),
+                height: frame.height - 12
+            )
+
+            // Status view - rounded square on left
+            statusView.frame = CGRect(
+                x: 12, y: 12, width: 70, height: cardContainerView.frame.height - 24)
+
+            // Status code label
+            statusCodeLabel.frame = CGRect(
+                x: 0, y: statusView.frame.height / 2 - 20, width: statusView.frame.width, height: 20
+            )
+
+            // Request time label
+            requestTimeLabel.frame = CGRect(
+                x: 0, y: statusCodeLabel.frame.maxY + 4, width: statusView.frame.width, height: 12)
+
+            // Time interval badge
+            timeIntervalLabel.frame = CGRect(
+                x: statusView.frame.maxX + padding,
+                y: cardContainerView.frame.height - 28,
+                width: 60,
+                height: 20
+            )
+
+            // URL Label
+            URLLabel.frame = CGRect(
+                x: statusView.frame.maxX + padding,
+                y: 12,
+                width: cardContainerView.frame.width - statusView.frame.maxX - padding - 50,
+                height: 36
+            )
+
+            // Method badge
+            let methodWidth: CGFloat = 50
+            methodBadge.frame = CGRect(
+                x: statusView.frame.maxX + padding,
+                y: URLLabel.frame.maxY + 4,
+                width: methodWidth,
+                height: 18
+            )
+
+            // Method label
+            methodLabel.frame = methodBadge.bounds
+
+            // Type label
+            typeLabel.frame = CGRect(
+                x: methodBadge.frame.maxX + 8,
+                y: URLLabel.frame.maxY + 4,
+                width: 120,
+                height: 18
+            )
+
+            // Circle indicator
+            circleView.frame = CGRect(
+                x: cardContainerView.frame.width - 22,
+                y: 12,
+                width: 10,
+                height: 10
+            )
+        }
+
+        func isNew() {
+            circleView.isHidden = false
+            // Add pulse animation
+            let pulseAnimation = CABasicAnimation(keyPath: "transform.scale")
+            pulseAnimation.duration = 1.0
+            pulseAnimation.fromValue = 1.0
+            pulseAnimation.toValue = 1.3
+            pulseAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            pulseAnimation.autoreverses = true
+            pulseAnimation.repeatCount = .infinity
+            circleView.layer.add(pulseAnimation, forKey: "pulse")
+        }
+
+        func isOld() {
+            circleView.isHidden = true
+            circleView.layer.removeAllAnimations()
+        }
+
+        func configForObject(_ obj: NFXHTTPModel) {
+            setURL(obj.requestURL ?? "-")
+            setStatus(obj.responseStatus ?? 999)
+            setTimeInterval(obj.timeInterval ?? 999)
+            setRequestTime(obj.requestTime ?? "-")
+            setType(obj.responseType ?? "-")
+            setMethod(obj.requestMethod ?? "-")
+            isNewBasedOnDate(obj.responseDate as Date? ?? Date())
+        }
+
+        func setURL(_ url: String) {
+            URLLabel.text = url
+        }
+
+        func setStatus(_ status: Int) {
+            statusCodeLabel.text = status == 999 ? "..." : "\(status)"
+
+            // Remove old gradient
+            statusGradientLayer?.removeFromSuperlayer()
+
+            if status == 999 {
+                // Pending/Loading - Gray
+                statusView.backgroundColor = UIColor.NFXGray44Color()
+                timeIntervalLabel.textColor = UIColor.NFXGray44Color()
+            } else if status < 400 {
+                // Success - Green gradient
+                let gradientLayer = CAGradientLayer()
+                gradientLayer.frame = statusView.bounds
+                gradientLayer.colors = [
+                    UIColor.NFXGreenColor().cgColor,
+                    UIColor.NFXDarkGreenColor().cgColor,
+                ]
+                gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+                gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+                gradientLayer.cornerRadius = 12
+                statusView.layer.insertSublayer(gradientLayer, at: 0)
+                statusGradientLayer = gradientLayer
+                timeIntervalLabel.textColor = UIColor.NFXGreenColor()
+            } else {
+                // Error - Red gradient
+                let gradientLayer = CAGradientLayer()
+                gradientLayer.frame = statusView.bounds
+                gradientLayer.colors = [
+                    UIColor.NFXRedColor().cgColor,
+                    UIColor.NFXDarkRedColor().cgColor,
+                ]
+                gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+                gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+                gradientLayer.cornerRadius = 12
+                statusView.layer.insertSublayer(gradientLayer, at: 0)
+                statusGradientLayer = gradientLayer
+                timeIntervalLabel.textColor = UIColor.NFXRedColor()
+            }
+        }
+
+        func setRequestTime(_ requestTime: String) {
+            requestTimeLabel.text = requestTime
+        }
+
+        func setTimeInterval(_ timeInterval: Float) {
+            if timeInterval == 999 {
+                timeIntervalLabel.text = " - "
+            } else {
+                timeIntervalLabel.text = String(format: " %.2fs ", timeInterval)
+            }
+        }
+
+        func setType(_ type: String) {
+            typeLabel.text = "• \(type)"
+        }
+
+        func setMethod(_ method: String) {
+            methodLabel.text = method
+
+            // Color code method badges
+            switch method {
+            case "GET":
+                methodBadge.backgroundColor = UIColor.NFXAccentColor().withAlphaComponent(0.15)
+                methodLabel.textColor = UIColor.NFXAccentColor()
+            case "POST":
+                methodBadge.backgroundColor = UIColor.NFXGreenColor().withAlphaComponent(0.15)
+                methodLabel.textColor = UIColor.NFXGreenColor()
+            case "PUT", "PATCH":
+                methodBadge.backgroundColor = UIColor.NFXYellowColor().withAlphaComponent(0.15)
+                methodLabel.textColor = UIColor.NFXYellowColor()
+            case "DELETE":
+                methodBadge.backgroundColor = UIColor.NFXRedColor().withAlphaComponent(0.15)
+                methodLabel.textColor = UIColor.NFXRedColor()
+            default:
+                methodBadge.backgroundColor = UIColor.NFXGray44Color().withAlphaComponent(0.15)
+                methodLabel.textColor = UIColor.NFXGray44Color()
+            }
+        }
+
+        func isNewBasedOnDate(_ responseDate: Date) {
+            if responseDate.isGreaterThanDate(NFX.sharedInstance().getLastVisitDate()) {
+                isNew()
+            } else {
+                isOld()
+            }
         }
     }
-    
-    func setRequestTime(_ requestTime: String) {
-        requestTimeLabel.text = requestTime
-    }
-    
-    func setTimeInterval(_ timeInterval: Float) {
-        if timeInterval == 999 {
-            timeIntervalLabel.text = "-"
-        } else {
-            timeIntervalLabel.text = NSString(format: "%.2f", timeInterval) as String
-        }
-    }
-    
-    func setType(_ type: String) {
-        typeLabel.text = type
-    }
-    
-    func setMethod(_ method: String) {
-        methodLabel.text = method
-    }
-    
-    func isNewBasedOnDate(_ responseDate: Date) {
-        if responseDate.isGreaterThanDate(NFX.sharedInstance().getLastVisitDate()) {
-            isNew()
-        } else {
-            isOld()
-        }
-    }
-}
 
 #endif
