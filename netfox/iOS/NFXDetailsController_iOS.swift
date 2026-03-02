@@ -152,17 +152,19 @@
                 let contentHeight = view.frame.height - contentTop - bottomInset
                 let contentWidth = view.frame.width - leftInset - rightInset
 
-                [infoView, requestView, responseView].forEach {
-                    $0.frame = CGRect(
-                        x: leftInset,
+                let selectedButtonIdx = headerButtons.firstIndex(where: { $0.isSelected }) ?? 0
+
+                [infoView, requestView, responseView].enumerated().forEach { idx, scrollView in
+                    scrollView.frame = CGRect(
+                        x: leftInset + (CGFloat(-selectedButtonIdx + idx) * contentWidth),
                         y: contentTop,
                         width: contentWidth,
                         height: contentHeight
                     )
 
                     // Update scroll view content insets for safe area
-                    $0.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
-                    $0.scrollIndicatorInsets = $0.contentInset
+                    scrollView.contentInset = UIEdgeInsets(top: 8, left: 0, bottom: 8, right: 0)
+                    scrollView.scrollIndicatorInsets = scrollView.contentInset
                 }
             }
         }

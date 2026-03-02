@@ -25,7 +25,6 @@ import Foundation
         var typeLabel: UILabel!
         var methodLabel: UILabel!
         var methodBadge: UIView!
-        var circleView: UIView!
         var statusCodeLabel: UILabel!
 
         override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -98,12 +97,6 @@ import Foundation
             typeLabel.textColor = UIColor.NFXGray44Color()
             typeLabel.font = UIFont.systemFont(ofSize: 11, weight: .medium)
             cardContainerView.addSubview(typeLabel)
-
-            // New indicator circle with pulse effect
-            circleView = UIView(frame: .zero)
-            circleView.layer.cornerRadius = 5
-            circleView.backgroundColor = UIColor.NFXPinkAccentColor()
-            cardContainerView.addSubview(circleView)
         }
 
         required init(coder aDecoder: NSCoder) {
@@ -175,32 +168,6 @@ import Foundation
                 width: 65,
                 height: 18
             )
-
-            // Circle indicator
-            circleView.frame = CGRect(
-                x: cardContainerView.frame.width - 22,
-                y: 12,
-                width: 10,
-                height: 10
-            )
-        }
-
-        func isNew() {
-            circleView.isHidden = false
-            // Add pulse animation
-            let pulseAnimation = CABasicAnimation(keyPath: "transform.scale")
-            pulseAnimation.duration = 1.0
-            pulseAnimation.fromValue = 1.0
-            pulseAnimation.toValue = 1.3
-            pulseAnimation.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-            pulseAnimation.autoreverses = true
-            pulseAnimation.repeatCount = .infinity
-            circleView.layer.add(pulseAnimation, forKey: "pulse")
-        }
-
-        func isOld() {
-            circleView.isHidden = true
-            circleView.layer.removeAllAnimations()
         }
 
         func configForObject(_ obj: NFXHTTPModel) {
@@ -210,7 +177,6 @@ import Foundation
             setRequestTime(obj.requestTime ?? "-")
             setType(obj.responseType ?? "-")
             setMethod(obj.requestMethod ?? "-")
-            isNewBasedOnDate(obj.responseDate as Date? ?? Date())
         }
 
         func setURL(_ url: String) {
@@ -309,14 +275,6 @@ import Foundation
             default:
                 methodBadge.backgroundColor = UIColor.NFXGray44Color().withAlphaComponent(0.15)
                 methodLabel.textColor = UIColor.NFXGray44Color()
-            }
-        }
-
-        func isNewBasedOnDate(_ responseDate: Date) {
-            if responseDate.isGreaterThanDate(NFX.sharedInstance().getLastVisitDate()) {
-                isNew()
-            } else {
-                isOld()
             }
         }
     }
