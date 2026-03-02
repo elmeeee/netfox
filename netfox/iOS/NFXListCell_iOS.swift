@@ -77,7 +77,8 @@ import Foundation
             URLLabel = UILabel(frame: .zero)
             URLLabel.textColor = UIColor.NFXBlackColor()
             URLLabel.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
-            URLLabel.numberOfLines = 2
+            URLLabel.numberOfLines = 0
+            URLLabel.lineBreakMode = .byCharWrapping
             cardContainerView.addSubview(URLLabel)
 
             // Method badge
@@ -122,33 +123,36 @@ import Foundation
 
             // Status view - rounded square on left
             statusView.frame = CGRect(
-                x: 12, y: 12, width: 70, height: cardContainerView.frame.height - 24)
+                x: 12, y: 12, width: 54, height: 54)
 
             // Status code label
             statusCodeLabel.frame = CGRect(
-                x: 0, y: statusView.frame.height / 2 - 20, width: statusView.frame.width, height: 20
+                x: 0, y: statusView.frame.height / 2 - 18, width: statusView.frame.width, height: 20
             )
 
             // Request time label
             requestTimeLabel.frame = CGRect(
-                x: 0, y: statusCodeLabel.frame.maxY + 4, width: statusView.frame.width, height: 12)
+                x: 0, y: statusCodeLabel.frame.maxY + 2, width: statusView.frame.width, height: 12)
 
             // Time interval badge - will be positioned on right side
             // (positioned after method/type to avoid overlap)
 
             // URL Label
+            let urlWidth = cardContainerView.frame.width - statusView.frame.maxX - padding - 30
+            let urlSize = URLLabel.sizeThatFits(
+                CGSize(width: urlWidth, height: .greatestFiniteMagnitude))
             URLLabel.frame = CGRect(
                 x: statusView.frame.maxX + padding,
                 y: 12,
-                width: cardContainerView.frame.width - statusView.frame.maxX - padding - 30,
-                height: 32
+                width: urlWidth,
+                height: max(20, urlSize.height)
             )
 
             // Method badge
             let methodWidth: CGFloat = 55
             methodBadge.frame = CGRect(
                 x: statusView.frame.maxX + padding,
-                y: URLLabel.frame.maxY + 6,
+                y: URLLabel.frame.maxY + 8,
                 width: methodWidth,
                 height: 18
             )
@@ -159,7 +163,7 @@ import Foundation
             // Type label
             typeLabel.frame = CGRect(
                 x: methodBadge.frame.maxX + 8,
-                y: URLLabel.frame.maxY + 6,
+                y: URLLabel.frame.maxY + 8,
                 width: 100,
                 height: 18
             )
@@ -167,7 +171,7 @@ import Foundation
             // Time interval badge - right side, same row
             timeIntervalLabel.frame = CGRect(
                 x: cardContainerView.frame.width - 70,
-                y: URLLabel.frame.maxY + 6,
+                y: URLLabel.frame.maxY + 8,
                 width: 65,
                 height: 18
             )

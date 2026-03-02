@@ -179,7 +179,21 @@
         }
 
         func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-            return 90
+            let model = tableData[indexPath.row]
+            let urlString = model.requestURL ?? "-"
+
+            let labelWidth = tableView.frame.width - 140
+            let font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+
+            let size = (urlString as NSString).boundingRect(
+                with: CGSize(width: labelWidth, height: .greatestFiniteMagnitude),
+                options: [.usesLineFragmentOrigin, .usesFontLeading],
+                attributes: [.font: font],
+                context: nil
+            )
+
+            let calculatedHeight = ceil(size.height) + 62
+            return max(90, calculatedHeight)
         }
 
     }
